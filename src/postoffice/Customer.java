@@ -32,7 +32,7 @@ class Customer implements Runnable{
 	}
 	
 	@Override
-	public void run() {
+	public void run(){
 		//waiting to enter office
 		try {
 			SharedResources.max_capacity.acquire();
@@ -42,6 +42,19 @@ class Customer implements Runnable{
 		try {
 			SharedResources.post_worker.acquire();
 		} catch(InterruptedException e) {e.printStackTrace();}
+		
+		try {
+			SharedResources.queue_mutex.acquire();
+		} catch(InterruptedException e) {e.printStackTrace();}
+		//add customer number and task to Linked List
+		SharedResources.offerList.addFirst(new Integer(customer_num));
+		SharedResources.offerList.addFirst(new Integer(giveTask()));
+		SharedResources.queue_mutex.release();
+		// wait until customer has been served
+		try {
+			SharedResources.served[customer_num].acquire();
+		} catch(InterruptedException e) {e.printStackTrace();}
+		
 	}
 
 }

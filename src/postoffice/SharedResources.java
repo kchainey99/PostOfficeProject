@@ -1,7 +1,7 @@
 package postoffice;
 
 import java.util.concurrent.Semaphore;
-import java.util.Queue;
+import java.util.LinkedList;
 /**Stores shared resources that are used in the entire program <br>
  * Resources include: <br>
  * - Semaphores <br>
@@ -15,4 +15,6 @@ class SharedResources {
 	public static Semaphore queue_mutex = new Semaphore(1, true);
 	public static Semaphore cust_left_counter = new Semaphore(0, true);
 	public static Semaphore cust_at_counter = new Semaphore(0, true);
+	
+	public static LinkedList<Integer> offerList = new LinkedList<Integer>(); //for passing information between customer and post worker
 }
