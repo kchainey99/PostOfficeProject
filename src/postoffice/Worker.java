@@ -2,10 +2,17 @@ package postoffice;
 
 import java.util.concurrent.Semaphore;
 
-class Worker extends Semaphores implements Runnable{
-	int worker_num;
+class Worker implements Runnable{
+	private int worker_num;
 	
+	public Worker(int num) {
+		worker_num = num;
+	}
 	
+	public int getNumber() {
+		int temp = worker_num;
+		return temp;
+	}
 
 	@Override
 	public void run() {

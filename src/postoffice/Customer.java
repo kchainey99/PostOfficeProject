@@ -3,15 +3,18 @@ package postoffice;
 import java.util.concurrent.Semaphore;
 import java.util.Random;
 
-class Customer extends Semaphores implements Runnable{
+class Customer implements Runnable{
 	private int customer_num;
+	
+	/**Initializes a Customer & gives them a customer number*/
 	public Customer(int customer_num) {
 		this.customer_num = customer_num;
 	}
 	
-	/** setter for customer number*/
-	public void setCustNum(int num) {
-		customer_num = num;
+	/** getter for customer number*/
+	public int getNumber() {
+		int temp = customer_num;
+		return temp;
 	}
 	
 	/**Decides what task to tell the Office Worker to execute. Returns a random number between 0-2*/
@@ -32,10 +35,13 @@ class Customer extends Semaphores implements Runnable{
 	public void run() {
 		//waiting to enter office
 		try {
-			super.max_capacity.acquire();
-		} catch(InterruptedException e) {
-			e.printStackTrace();
-		}
+			SharedResources.max_capacity.acquire();
+		} catch(InterruptedException e) {e.printStackTrace();}
+		enterOffice();
+		// wait for next available worker
+		try {
+			SharedResources.post_worker.acquire();
+		} catch(InterruptedException e) {e.printStackTrace();}
 	}
 
 }
