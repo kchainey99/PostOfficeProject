@@ -51,14 +51,11 @@ class Customer implements Runnable{
 		SharedResources.offerList.addFirst(new Integer(customer_num));
 		SharedResources.offerList.addFirst(new Integer(giveTask()));
 		SharedResources.queue_mutex.release();
-		// wait until customer has been served
 		try {
-			SharedResources.served[customer_num].acquire();
+			SharedResources.served[customer_num].acquire(); // wait until customer has been served
 		} catch(InterruptedException e) {e.printStackTrace();}
-		//leave counter
-		SharedResources.cust_left_counter.release();
-		//leave office
-		leaveOffice();
+		SharedResources.cust_left_counter.release(); //leave counter
+		leaveOffice(); //leave office
 		SharedResources.max_capacity.release();
 	}
 

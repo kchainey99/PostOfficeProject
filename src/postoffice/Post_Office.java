@@ -17,7 +17,7 @@ class Post_Office {
 		Worker[] worker_arr = new Worker[total_workers];
 		Thread[] worker_threads = new Thread[total_workers];
 		
-		/* Initializing customer threads & customer SharedResources */
+		/* Initializing customer threads & customer semaphores */
 		for (int i = 0; i < total_customers; i++) {
 			SharedResources.served[i] = new Semaphore(0, true); //all customers start not served, hence 0
 			cust_arr[i] = new Customer(i);
