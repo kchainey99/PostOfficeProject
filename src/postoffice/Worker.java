@@ -1,7 +1,6 @@
 package postoffice;
 
-import java.util.concurrent.Semaphore;
-
+/** Takes in and processes customer transactions */
 class Worker implements Runnable{
 	private int worker_num;
 	
@@ -37,7 +36,24 @@ class Worker implements Runnable{
 	public void run() {
 		int served_c, c_task; //served customer number and customer task, respectively
 		
-		
+		while(true) {
+			try {
+				SharedResources.cust_at_counter.acquire();
+			} catch (InterruptedException e) {e.printStackTrace();}
+			try {
+				SharedResources.queue_mutex.acquire();				
+			} catch (InterruptedException e) {e.printStackTrace();}
+			served_c = SharedResources.offerList.removeLast(); //remove the customer number in a FIFO manner
+			c_task = SharedResources.offerList.removeLast(); //remove customer task
+			SharedResources.queue_mutex.release();
+			try {
+				serve_cust(served_c, c_task);
+			} catch (InterruptedException e) {e.printStackTrace();}
+			try {
+				SharedResources.cust_left_counter.acquire(); //wait until customer has left counter
+			} catch (InterruptedException e) {e.printStackTrace();}
+			SharedResources.post_worker.release(); //make post worker available for next customer
+		}
 	}
 	
 }

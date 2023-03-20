@@ -1,8 +1,8 @@
 package postoffice;
 
-import java.util.concurrent.Semaphore;
 import java.util.Random;
 
+/**Simulates a customer at a post office. */
 class Customer implements Runnable{
 	private int customer_num;
 	
@@ -42,7 +42,8 @@ class Customer implements Runnable{
 		try {
 			SharedResources.post_worker.acquire();
 		} catch(InterruptedException e) {e.printStackTrace();}
-		
+		//approach the counter and give the post worker their task
+		SharedResources.cust_at_counter.release();
 		try {
 			SharedResources.queue_mutex.acquire();
 		} catch(InterruptedException e) {e.printStackTrace();}
@@ -54,7 +55,11 @@ class Customer implements Runnable{
 		try {
 			SharedResources.served[customer_num].acquire();
 		} catch(InterruptedException e) {e.printStackTrace();}
-		
+		//leave counter
+		SharedResources.cust_left_counter.release();
+		//leave office
+		leaveOffice();
+		SharedResources.max_capacity.release();
 	}
 
 }
