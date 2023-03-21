@@ -55,7 +55,7 @@ public class Sem1 implements Runnable
       // create threads
       for( i = 0; i < NUMTHREADS; ++i ) 
       {
-	 thr[i] = new Sem1(i);
+    	 thr[i] = new Sem1(i);
          myThread[i] = new Thread( thr[i] );
          myThread[i].start();
       }

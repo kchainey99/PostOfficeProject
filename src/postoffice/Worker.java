@@ -24,32 +24,54 @@ class Worker implements Runnable{
 			Thread.sleep(1500);
 			break;
 		case 2:
-			System.out.println("Customer " + c_num + " asked post worker" + worker_num + " to mail a package.");
+			System.out.println("Customer " + c_num + " asked post worker " + worker_num + " to mail a package.");
 			SharedResources.scale.acquire();
 			Thread.sleep(2000);
 			SharedResources.scale.release();
 			break;
 		}
 	}
+	
+	/**Prints out [X] post worker serving [Y] customer
+	 * @param c_num - customer number*/
+	void printServingCustomer(int c_num) {
+		System.out.println("Postal Worker " + worker_num + " is serving customer " + c_num);
+	}
+	
+	/** Gets customer info from Linked List in a FIFO manner.
+	 * 
+	 * @return A vector of size 2. <br>
+	 * - vector[0] = customer number <br>
+	 * - vector[1] = task
+	 */
+	int[] getCustomerInfo() {
+		int[] custinfo = new int[2];
+		custinfo[0] = SharedResources.offerList.removeLast();
+		custinfo[1] = SharedResources.offerList.removeLast();
+		return custinfo;
+	}
 
 	@Override
 	public void run() {
-		int served_c, c_task; //served customer number and customer task, respectively
+		int[] custInfo; //customer info vector. custInfo[0] = name, custInfo[1] = task
 		
 		while(true) {
+			//wait until customer is at the counter
 			try {
 				SharedResources.cust_at_counter.acquire();
 			} catch (InterruptedException e) {e.printStackTrace();}
 			try {
 				SharedResources.queue_mutex.acquire();				
 			} catch (InterruptedException e) {e.printStackTrace();}
-			served_c = SharedResources.offerList.removeLast(); //remove the customer number in a FIFO manner
-			c_task = SharedResources.offerList.removeLast(); //remove customer task
+			custInfo = getCustomerInfo();
+			int customerNum = custInfo[0];
+			int customerTask = custInfo[1];
 			SharedResources.queue_mutex.release();
+			printServingCustomer(customerNum);
 			try {
-				serve_cust(served_c, c_task);
+				serve_cust(customerNum, customerTask);
 			} catch (InterruptedException e) {e.printStackTrace();}
-			SharedResources.served[served_c].release(); //signal that customer has been served
+			SharedResources.served[customerNum].release(); //signal that customer has been served
 			try {
 				SharedResources.cust_left_counter.acquire(); //wait until customer has left counter
 			} catch (InterruptedException e) {e.printStackTrace();}

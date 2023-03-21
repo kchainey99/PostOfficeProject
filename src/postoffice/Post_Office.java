@@ -17,6 +17,14 @@ class Post_Office {
 		Worker[] worker_arr = new Worker[total_workers];
 		Thread[] worker_threads = new Thread[total_workers];
 		
+		/* Initializing worker threads*/
+		for (int i = 0; i < total_workers; i++) {
+			worker_arr[i] = new Worker(i);
+			worker_threads[i] = new Thread(worker_arr[i]);
+			worker_threads[i].start();
+			System.out.println("Worker " + worker_arr[i].getNumber() + " created.");
+		}
+		
 		/* Initializing customer threads & customer semaphores */
 		for (int i = 0; i < total_customers; i++) {
 			SharedResources.served[i] = new Semaphore(0, true); //all customers start not served, hence 0
@@ -24,14 +32,6 @@ class Post_Office {
 			cust_threads[i] = new Thread(cust_arr[i]);
 			cust_threads[i].start();
 			System.out.println("Customer " + cust_arr[i].getNumber() + " created.");
-		}
-		
-		/* Initializing worker threads*/
-		for (int i = 0; i < total_workers; i++) {
-			worker_arr[i] = new Worker(i);
-			worker_threads[i] = new Thread(worker_arr[i]);
-			worker_threads[i].start();
-			System.out.println("Worker " + worker_arr[i].getNumber() + " created.");
 		}
 		
 		/* Join threads */

@@ -11,24 +11,31 @@ class Customer implements Runnable{
 		this.customer_num = customer_num;
 	}
 	
-	/** getter for customer number*/
+	/**  customer number*/
 	public int getNumber() {
 		int temp = customer_num;
 		return temp;
 	}
 	
 	/**Decides what task to tell the Office Worker to execute. Returns a random number between 0-2*/
-	private int giveTask() {
+	private int createTask() {
 		return new Random().nextInt(3);
 	}
 	
 	/**Prints message to say when this customer has entered the office*/
 	void enterOffice() {
-		System.out.println("Customer " + customer_num + " has entered the office.");
+		System.out.println("Customer " + getNumber() + " has entered the office.");
 	}
 	
 	void leaveOffice() {
-		System.out.println("Customer " + customer_num + "has left the office.");
+		System.out.println("Customer " + getNumber() + " has left the office.");
+	}
+	
+	/**Adds customer number and customer name to LinkedList. <br>
+	 * Linked List is treated as a queue*/
+	void giveTask() {
+		SharedResources.offerList.addFirst(Integer.valueOf(customer_num));
+		SharedResources.offerList.addFirst(Integer.valueOf(createTask()));
 	}
 	
 	@Override
@@ -43,14 +50,12 @@ class Customer implements Runnable{
 			SharedResources.post_worker.acquire();
 		} catch(InterruptedException e) {e.printStackTrace();}
 		//approach the counter and give the post worker their task
-		SharedResources.cust_at_counter.release();
 		try {
 			SharedResources.queue_mutex.acquire();
 		} catch(InterruptedException e) {e.printStackTrace();}
-		//add customer number and task to Linked List
-		SharedResources.offerList.addFirst(new Integer(customer_num));
-		SharedResources.offerList.addFirst(new Integer(giveTask()));
+		giveTask();
 		SharedResources.queue_mutex.release();
+		SharedResources.cust_at_counter.release();
 		try {
 			SharedResources.served[customer_num].acquire(); // wait until customer has been served
 		} catch(InterruptedException e) {e.printStackTrace();}
