@@ -72,9 +72,6 @@ class Worker implements Runnable{
 				serve_cust(customerNum, customerTask);
 			} catch (InterruptedException e) {e.printStackTrace();}
 			SharedResources.served[customerNum].release(); //signal that customer has been served
-			try {
-				SharedResources.cust_left_counter.acquire(); //wait until customer has left counter
-			} catch (InterruptedException e) {e.printStackTrace();}
 			SharedResources.post_worker.release(); //make post worker available for next customer
 		}
 	}

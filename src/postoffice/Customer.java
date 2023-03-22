@@ -59,7 +59,6 @@ class Customer implements Runnable{
 		try {
 			SharedResources.served[customer_num].acquire(); // wait until customer has been served
 		} catch(InterruptedException e) {e.printStackTrace();}
-		SharedResources.cust_left_counter.release(); //leave counter
 		leaveOffice(); //leave office
 		SharedResources.max_capacity.release();
 	}
